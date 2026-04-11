@@ -18,7 +18,7 @@ class EmailSender:
         current_date = datetime.now().strftime('%Y-%m-%d')
         
         try:
-            subject = f"Arxiv里德堡原子论文摘要 - {current_date}"
+            subject = f"Arxiv论文摘要 - {current_date}"
             
             if papers:
                 # 有论文的情况
