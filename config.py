@@ -9,6 +9,9 @@ class Config:
     EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
     RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
     
+    # 从环境变量读取天数，默认为 1
+    FETCH_DAYS = int(os.getenv("FETCH_DAYS", 1))
+    
     # Arxiv配置
     SEARCH_KEYWORDS = os.getenv("SEARCH_KEYWORDS", "Rydberg atom").split(",")
     MAX_RESULTS = int(os.getenv("MAX_RESULTS", 20))
