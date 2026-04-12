@@ -25,5 +25,9 @@ jobs:
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
-          FETCH_DAYS: 7
+
+          # 搜索控制（直接写在这里，方便在 GitHub 网页上修改）
+          FETCH_DAYS: 15
+          MAX_RESULTS: 15
+          SEARCH_KEYWORDS: "tweezer array, rydberg atoms, integrated photonics"
         run: python main.py
