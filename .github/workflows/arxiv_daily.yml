@@ -29,5 +29,5 @@ jobs:
           # 搜索控制（直接写在这里，方便在 GitHub 网页上修改）
           FETCH_DAYS: 1
           MAX_RESULTS: 20
-          SEARCH_KEYWORDS: "tweezer array, integrated photonics, strontium optical clocks, tweezer arrays, arno rauschenbeutel, integrated photonic "
+          SEARCH_KEYWORDS: "tweezer array, integrated photonics, tweezer arrays, arno rauschenbeutel, integrated photonic, nanofiber "
         run: python main.py
