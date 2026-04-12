@@ -30,7 +30,7 @@ class ArxivDailyDigest:
         
         try:
             # 1. 获取论文
-            days_back = 0 if test_mode else 1
+            days_back = 0 if test_mode else 7
             papers = self.fetcher.fetch_recent_papers(days_back=days_back)
             
             # 2. 生成摘要
