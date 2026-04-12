@@ -118,7 +118,7 @@ class EmailSender:
         
         return f"""
         {'='*60}
-        ARXIV 里德堡原子论文监控报告
+        ARXIV 论文监控报告
         {'='*60}
         
         报告日期：{current_date}
@@ -180,7 +180,7 @@ class EmailSender:
         </head>
         <body>
             <div class="header">
-                <h1>📚 Arxiv 里德堡原子论文每日摘要</h1>
+                <h1>📚 Arxiv 论文每日摘要</h1>
                 <p>日期: {datetime.now().strftime('%Y年%m月%d日')} | 共 {len(papers)} 篇论文</p>
             </div>
         """
@@ -207,7 +207,7 @@ class EmailSender:
         html += """
             <hr>
             <p style="color: #95a5a6; font-size: 12px;">
-                此邮件由Arxiv自动摘要系统生成 | 关键词: 里德堡原子, Rydberg atom
+                此邮件由Arxiv自动摘要系统生成 | 关键词: 
             </p>
         </body>
         </html>
