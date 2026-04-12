@@ -26,7 +26,7 @@ class ArxivFetcher:
             
             # 构建查询
             date_range = f"[{start_date.strftime('%Y%m%d')} TO {end_date.strftime('%Y%m%d')}]"
-            keyword_query = " OR ".join([f'abs:"{kw.strip()}"' for kw in self.keywords])
+            keyword_query = " OR ".join([f'all:"{kw.strip()}"' for kw in self.keywords])
             query = f"({keyword_query}) AND submittedDate:{date_range}"
             
             logger.info(f"搜索查询: {query}")
