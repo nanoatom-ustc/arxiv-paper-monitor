@@ -74,7 +74,7 @@ class EmailSender:
                 <div class="header">
                     <div class="icon">📭</div>
                     <h1 style="color: #6c757d;">今日无新论文</h1>
-                    <p>Arxiv 里德堡原子论文监控报告</p>
+                    <p>Arxiv 论文监控报告</p>
                 </div>
                 
                 <div class="content">
@@ -147,7 +147,7 @@ class EmailSender:
     def _build_text_content(self, papers, summaries):
         """构建纯文本内容"""
         content = [
-            f"Arxiv 里德堡原子论文每日摘要",
+            f"Arxiv 论文每日摘要",
             f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
             f"共发现 {len(papers)} 篇相关论文",
             "=" * 60,
