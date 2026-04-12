@@ -19,7 +19,7 @@ class ArxivFetcher:
             days_back: 回溯天数，默认为1（获取昨天的）
         """
         try:
-            days_back = 1
+            # days_back = 1  <-- 🚩 必须删除或注释掉这一行！
             # 计算日期范围
             end_date = datetime.now()
             start_date = end_date - timedelta(days=days_back)
