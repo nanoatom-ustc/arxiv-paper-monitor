@@ -27,7 +27,7 @@ jobs:
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
 
           # 搜索控制（直接写在这里，方便在 GitHub 网页上修改）
-          FETCH_DAYS: 1
+          FETCH_DAYS: 10
           MAX_RESULTS: 20
           SEARCH_KEYWORDS: "tweezer array, integrated photonics, tweezer arrays, arno rauschenbeutel, integrated photonic, nanofiber "
         run: python main.py
