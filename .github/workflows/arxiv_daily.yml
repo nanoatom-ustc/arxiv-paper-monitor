@@ -29,5 +29,5 @@ jobs:
           # 搜索控制（直接写在这里，方便在 GitHub 网页上修改）
           FETCH_DAYS: 2
           MAX_RESULTS: 20
-          SEARCH_KEYWORDS: "tweezer array, integrated photonics, tweezer arrays, arno rauschenbeutel, integrated photonic, nanofiber, array, casimir polder "
+          SEARCH_KEYWORDS: "tweezer array, integrated photonics, tweezer arrays, arno rauschenbeutel, integrated photonic, nanofiber, casimir polder "
         run: python main.py
