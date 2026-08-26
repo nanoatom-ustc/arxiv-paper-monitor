@@ -8,7 +8,9 @@ from aps_fetcher import APSFetcher
 from arxiv_fetcher import ArxivFetcher
 from config import Config
 from email_sender import EmailSender
+from nature_fetcher import NatureFetcher
 from paper_utils import generate_summary
+from science_fetcher import ScienceFetcher
 
 
 logging.basicConfig(
@@ -21,7 +23,12 @@ logger = logging.getLogger(__name__)
 
 class PaperDailyDigest:
     def __init__(self):
-        factories = {"arxiv": ArxivFetcher, "aps": APSFetcher}
+        factories = {
+            "arxiv": ArxivFetcher,
+            "aps": APSFetcher,
+            "nature": NatureFetcher,
+            "science": ScienceFetcher,
+        }
         self.fetchers = [factories[source]() for source in Config.SEARCH_SOURCES]
         self.email_sender = EmailSender()
 
