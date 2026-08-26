@@ -1,9 +1,10 @@
-name: Daily Arxiv Paper Digest
+name: Daily Paper Digest
+
 on:
   schedule:
-    # 每天UTC时间1点运行，即北京/新加坡时间上午9点
-    - cron: '0 1 * * *'  
-  workflow_dispatch: # 允许在 GitHub 网页上点击按钮手动触发
+    # 每天 UTC 1 点运行，即北京时间上午 9 点
+    - cron: '0 1 * * *'
+  workflow_dispatch:
 
 jobs:
   send-digest:
@@ -20,17 +21,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Arxiv Digest
+      - name: Run paper digest
         env:
-          # 敏感信息（密码、邮箱等）：保持从 Secrets 读取
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
 
-          # 搜索控制：优先从 GitHub Variables 读取你设置的值。
-          # 如果你在 Variables 里没配，就会自动回退使用后面单引号里的默认值。
           FETCH_DAYS: ${{ vars.FETCH_DAYS || '2' }}
           MAX_RESULTS: ${{ vars.MAX_RESULTS || '20' }}
           SEARCH_KEYWORDS: ${{ vars.SEARCH_KEYWORDS || 'tweezer array, integrated photonics, tweezer arrays, arno rauschenbeutel, integrated photonic, nanofiber, casimir polder, FPGA' }}
+          SEARCH_SOURCES: ${{ vars.SEARCH_SOURCES || 'arxiv,aps' }}
           SEARCH_CATEGORIES: ${{ vars.SEARCH_CATEGORIES || '' }}
+          APS_JOURNALS: ${{ vars.APS_JOURNALS || '' }}
+          CROSSREF_MAILTO: ${{ vars.CROSSREF_MAILTO || '' }}
         run: python main.py
+
