@@ -29,14 +29,26 @@ class Config:
         "nanophotonics",
     ]
 
-    # Keep arXiv enabled and add APS by default. Existing deployments can restore
-    # arXiv-only behavior with SEARCH_SOURCES=arxiv.
-    SEARCH_SOURCES = [source.lower() for source in _csv_env("SEARCH_SOURCES", "arxiv,aps")]
+    SEARCH_SOURCES = [
+        source.lower()
+        for source in _csv_env("SEARCH_SOURCES", "arxiv,aps,nature,science")
+    ]
     SEARCH_CATEGORIES = _csv_env("SEARCH_CATEGORIES")
 
-    # Optional APS journal title/abbreviation filter, e.g. "Physical Review A,PRL".
-    # An empty value covers all APS journal articles registered under DOI prefix 10.1103.
+    # Publisher-specific allowlists. Defaults intentionally keep the digest focused.
     APS_JOURNALS = _csv_env("APS_JOURNALS")
+    NATURE_JOURNALS = _csv_env(
+        "NATURE_JOURNALS",
+        "Nature,Nature Physics,Nature Photonics,Nature Communications,"
+        "npj Quantum Information,Nature Reviews Physics",
+    )
+    SCIENCE_JOURNALS = _csv_env("SCIENCE_JOURNALS", "Science,Science Advances")
+
+    # PRB and PRD are excluded by default as requested. The variable remains
+    # configurable so deployments can add other APS exclusions.
+    APS_EXCLUDE_JOURNALS = _csv_env(
+        "APS_EXCLUDE_JOURNALS", "Physical Review B,Physical Review D,PRB,PRD"
+    )
     CROSSREF_MAILTO = os.getenv("CROSSREF_MAILTO", "").strip()
 
     SCHEDULE_TIME = "09:00"
@@ -48,11 +60,11 @@ class Config:
         if not cls.EMAIL_SENDER or not cls.EMAIL_PASSWORD or not cls.RECIPIENT_EMAIL:
             raise ValueError("邮箱配置不完整，请检查 .env 文件或 GitHub Secrets")
 
-        supported_sources = {"arxiv", "aps"}
+        supported_sources = {"arxiv", "aps", "nature", "science"}
         unknown_sources = set(cls.SEARCH_SOURCES) - supported_sources
         if unknown_sources:
             raise ValueError(f"不支持的数据源: {', '.join(sorted(unknown_sources))}")
         if not cls.SEARCH_SOURCES:
-            raise ValueError("SEARCH_SOURCES 至少需要包含 arxiv 或 aps")
+            raise ValueError("SEARCH_SOURCES 至少需要包含一个支持的数据源")
         return True
 

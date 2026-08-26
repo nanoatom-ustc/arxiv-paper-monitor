@@ -30,9 +30,12 @@ jobs:
           FETCH_DAYS: ${{ vars.FETCH_DAYS || '2' }}
           MAX_RESULTS: ${{ vars.MAX_RESULTS || '20' }}
           SEARCH_KEYWORDS: ${{ vars.SEARCH_KEYWORDS || 'tweezer array, integrated photonics, tweezer arrays, arno rauschenbeutel, integrated photonic, nanofiber, casimir polder, FPGA' }}
-          SEARCH_SOURCES: ${{ vars.SEARCH_SOURCES || 'arxiv,aps' }}
+          SEARCH_SOURCES: ${{ vars.SEARCH_SOURCES || 'arxiv,aps,nature,science' }}
           SEARCH_CATEGORIES: ${{ vars.SEARCH_CATEGORIES || '' }}
           APS_JOURNALS: ${{ vars.APS_JOURNALS || '' }}
+          APS_EXCLUDE_JOURNALS: ${{ vars.APS_EXCLUDE_JOURNALS || 'Physical Review B,Physical Review D,PRB,PRD' }}
+          NATURE_JOURNALS: ${{ vars.NATURE_JOURNALS || 'Nature,Nature Physics,Nature Photonics,Nature Communications,npj Quantum Information,Nature Reviews Physics' }}
+          SCIENCE_JOURNALS: ${{ vars.SCIENCE_JOURNALS || 'Science,Science Advances' }}
           CROSSREF_MAILTO: ${{ vars.CROSSREF_MAILTO || '' }}
         run: python main.py
 
