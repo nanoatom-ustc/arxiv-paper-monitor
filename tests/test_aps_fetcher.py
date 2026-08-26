@@ -129,6 +129,34 @@ class PublisherFetcherTests(unittest.TestCase):
         self.assertEqual(papers[0]["journal"], "Science Advances")
         self.assertIn("/prefixes/10.1126/works", session.calls[0][0])
 
+    @patch("nature_fetcher.Config.SEARCH_KEYWORDS", ["quantum"])
+    @patch("nature_fetcher.Config.NATURE_JOURNALS", ["Nature"])
+    def test_nature_allowlist_uses_exact_title_not_prefix(self):
+        item = dict(APS_ITEM)
+        item.update({
+            "DOI": "10.1038/nmat.example",
+            "title": ["A quantum result"],
+            "container-title": ["Nature Materials"],
+        })
+        papers = NatureFetcher(session=FakeSession([item])).fetch_recent_papers(
+            days_back=1, max_results=10
+        )
+        self.assertEqual(papers, [])
+
+    @patch("science_fetcher.Config.SEARCH_KEYWORDS", ["quantum"])
+    @patch("science_fetcher.Config.SCIENCE_JOURNALS", ["Science"])
+    def test_science_allowlist_uses_exact_title_not_prefix(self):
+        item = dict(APS_ITEM)
+        item.update({
+            "DOI": "10.1126/scirobotics.example",
+            "title": ["A quantum result"],
+            "container-title": ["Science Robotics"],
+        })
+        papers = ScienceFetcher(session=FakeSession([item])).fetch_recent_papers(
+            days_back=1, max_results=10
+        )
+        self.assertEqual(papers, [])
+
 
 if __name__ == "__main__":
     unittest.main()

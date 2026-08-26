@@ -135,7 +135,9 @@ class CrossrefFetcher:
         normalised = re.sub(r"[^a-z0-9]", "", journal.lower())
         configured_normalised = re.sub(r"[^a-z0-9]", "", configured.lower())
         acronym = "".join(word[0] for word in re.findall(r"[a-z0-9]+", journal.lower()))
-        return configured_normalised in normalised or configured_normalised == acronym
+        # Use exact normalised title matching so an allowlist entry such as
+        # "Nature" does not also admit every journal whose title starts with Nature.
+        return configured_normalised == normalised or configured_normalised == acronym
 
     @staticmethod
     def _clean_abstract(value: str) -> str:

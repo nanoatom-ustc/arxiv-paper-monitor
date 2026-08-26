@@ -35,10 +35,14 @@ class Config:
     ]
     SEARCH_CATEGORIES = _csv_env("SEARCH_CATEGORIES")
 
-    # Optional publisher-specific allowlists. Empty means all journals for that source.
+    # Publisher-specific allowlists. Defaults intentionally keep the digest focused.
     APS_JOURNALS = _csv_env("APS_JOURNALS")
-    NATURE_JOURNALS = _csv_env("NATURE_JOURNALS")
-    SCIENCE_JOURNALS = _csv_env("SCIENCE_JOURNALS")
+    NATURE_JOURNALS = _csv_env(
+        "NATURE_JOURNALS",
+        "Nature,Nature Physics,Nature Photonics,Nature Communications,"
+        "npj Quantum Information,Nature Reviews Physics",
+    )
+    SCIENCE_JOURNALS = _csv_env("SCIENCE_JOURNALS", "Science,Science Advances")
 
     # PRB and PRD are excluded by default as requested. The variable remains
     # configurable so deployments can add other APS exclusions.

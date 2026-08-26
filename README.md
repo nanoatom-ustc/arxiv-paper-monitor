@@ -8,8 +8,8 @@
 
 - arXiv：全部分区，可通过 `SEARCH_CATEGORIES` 限制。
 - APS：全部 APS 期刊，但默认排除 **Physical Review B（PRB）** 和 **Physical Review D（PRD）**。
-- Nature：`10.1038` 前缀下的 Nature Portfolio 期刊及子刊。
-- Science：`10.1126` 前缀下的 Science/AAAS 期刊及子刊，例如 Science Advances、Science Robotics、Science Immunology、Science Signaling 和 Science Translational Medicine。
+- Nature：仅 Nature、Nature Physics、Nature Photonics、Nature Communications、npj Quantum Information 和 Nature Reviews Physics。
+- Science：仅 Science 和 Science Advances。
 
 不同数据源的结果会统一排序、按 DOI/ID 去重，最后共同应用 `MAX_RESULTS` 限制。
 
@@ -34,8 +34,8 @@ Fork 仓库后，在 `Settings → Secrets and variables → Actions` 中配置�
 | `SEARCH_CATEGORIES` | 空 | arXiv 分区代码，仅影响 arXiv |
 | `APS_JOURNALS` | 空 | APS 期刊允许列表；空表示除排除项外的全部 APS 期刊 |
 | `APS_EXCLUDE_JOURNALS` | `Physical Review B,Physical Review D,PRB,PRD` | APS 期刊排除列表 |
-| `NATURE_JOURNALS` | 空 | Nature 期刊允许列表；空表示全部 Nature Portfolio 期刊 |
-| `SCIENCE_JOURNALS` | 空 | Science 期刊允许列表；空表示全部 Science/AAAS 期刊 |
+| `NATURE_JOURNALS` | 6 本指定期刊 | Nature 期刊允许列表 |
+| `SCIENCE_JOURNALS` | `Science,Science Advances` | Science 期刊允许列表 |
 | `FETCH_DAYS` | `2` | 查询最近几天；`0` 表示不添加日期限制 |
 | `MAX_RESULTS` | `20` | 合并所有数据源后最多保留的论文数 |
 | `CROSSREF_MAILTO` | 空 | 可选联系邮箱，建议设置以遵循 Crossref polite-pool 规范 |
@@ -47,14 +47,14 @@ SEARCH_KEYWORDS=Rydberg atom,optical tweezers,nanophotonics
 SEARCH_SOURCES=arxiv,aps,nature,science
 SEARCH_CATEGORIES=physics.atom-ph,quant-ph,physics.optics
 APS_EXCLUDE_JOURNALS=Physical Review B,Physical Review D,PRB,PRD
-NATURE_JOURNALS=Nature,Nature Physics,Nature Photonics,Nature Communications
-SCIENCE_JOURNALS=Science,Science Advances,Science Robotics
+NATURE_JOURNALS=Nature,Nature Physics,Nature Photonics,Nature Communications,npj Quantum Information,Nature Reviews Physics
+SCIENCE_JOURNALS=Science,Science Advances
 FETCH_DAYS=2
 MAX_RESULTS=30
 CROSSREF_MAILTO=your-email@example.com
 ```
 
-期刊过滤支持不区分大小写的名称包含匹配和常见首字母缩写。不要配置 `NATURE_JOURNALS` 或 `SCIENCE_JOURNALS`，即可覆盖对应出版集团的全部主刊与子刊。
+期刊过滤采用不区分大小写的精确名称匹配，也支持常见首字母缩写。这样 `Nature` 不会误匹配 Nature Materials，`Science` 也不会误匹配 Science Robotics。
 
 ## 手动运行和测试
 
