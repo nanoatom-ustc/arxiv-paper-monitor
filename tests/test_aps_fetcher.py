@@ -3,6 +3,7 @@ from unittest.mock import patch
 
 from aps_fetcher import APSFetcher
 from nature_fetcher import NatureFetcher
+from optica_fetcher import OpticaFetcher
 from science_fetcher import ScienceFetcher
 
 
@@ -129,6 +130,38 @@ class PublisherFetcherTests(unittest.TestCase):
         self.assertEqual(papers[0]["journal"], "Science Advances")
         self.assertIn("/prefixes/10.1126/works", session.calls[0][0])
 
+    @patch("optica_fetcher.Config.SEARCH_KEYWORDS", ["quantum"])
+    @patch("optica_fetcher.Config.OPTICA_JOURNALS", ["Optica", "Optics Express"])
+    def test_optica_uses_1364_prefix_and_includes_configured_journals(self):
+        items = []
+        for suffix, journal in (("optica.example", "Optica"), ("oe.example", "Optics Express")):
+            item = dict(APS_ITEM)
+            item.update({
+                "DOI": f"10.1364/{suffix}",
+                "title": [f"A quantum result in {journal}"],
+                "container-title": [journal],
+            })
+            items.append(item)
+        session = FakeSession(items)
+        papers = OpticaFetcher(session=session).fetch_recent_papers(days_back=1, max_results=10)
+        self.assertEqual({paper["journal"] for paper in papers}, {"Optica", "Optics Express"})
+        self.assertTrue(all(paper["source"] == "Optica" for paper in papers))
+        self.assertIn("/prefixes/10.1364/works", session.calls[0][0])
+
+    @patch("optica_fetcher.Config.SEARCH_KEYWORDS", ["quantum"])
+    @patch("optica_fetcher.Config.OPTICA_JOURNALS", ["Optica", "Optics Express"])
+    def test_optica_allowlist_excludes_other_optica_journals(self):
+        item = dict(APS_ITEM)
+        item.update({
+            "DOI": "10.1364/ao.example",
+            "title": ["A quantum result"],
+            "container-title": ["Applied Optics"],
+        })
+        papers = OpticaFetcher(session=FakeSession([item])).fetch_recent_papers(
+            days_back=1, max_results=10
+        )
+        self.assertEqual(papers, [])
+
     @patch("nature_fetcher.Config.SEARCH_KEYWORDS", ["quantum"])
     @patch("nature_fetcher.Config.NATURE_JOURNALS", ["Nature"])
     def test_nature_allowlist_uses_exact_title_not_prefix(self):
@@ -160,4 +193,3 @@ class PublisherFetcherTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
