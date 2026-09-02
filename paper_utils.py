@@ -1,4 +1,58 @@
-from typing import Dict
+import re
+from typing import Dict, Iterable, List
+
+
+_KEYWORD_ALIASES = {
+    "tweezer array": ("tweezer array", "tweezer arrays"),
+    "pic": (
+        "pic",
+        "pics",
+        "photonic integrated circuit",
+        "photonic integrated circuits",
+        "integrated photonic circuit",
+        "integrated photonic circuits",
+    ),
+    "microring": ("microring", "microrings", "micro ring", "micro rings"),
+    "nanofiber": ("nanofiber", "nanofibers", "nano fiber", "nano fibers"),
+    "surface force": ("surface force", "surface forces"),
+}
+
+
+def _normalise_match_text(value: str) -> str:
+    words_only = re.sub(r"[^a-z0-9]+", " ", (value or "").lower())
+    return re.sub(r"\s+", " ", words_only).strip()
+
+
+def keyword_aliases(keyword: str) -> List[str]:
+    cleaned = keyword.strip()
+    normalised = _normalise_match_text(cleaned)
+    return list(_KEYWORD_ALIASES.get(normalised, (cleaned,)))
+
+
+def keyword_query_terms(keyword: str) -> List[str]:
+    """Return a compact set of API query terms while keeping PIC discoverable."""
+    if _normalise_match_text(keyword) == "pic":
+        return ["PIC", "photonic integrated circuit", "integrated photonic circuit"]
+    return [keyword.strip()]
+
+
+def keyword_matches(text: str, keyword: str) -> bool:
+    normalised_text = f" {_normalise_match_text(text)} "
+    return any(
+        f" {_normalise_match_text(alias)} " in normalised_text
+        for alias in keyword_aliases(keyword)
+        if _normalise_match_text(alias)
+    )
+
+
+def find_matching_keywords(title: str, abstract: str, keywords: Iterable[str]) -> List[str]:
+    """Require a configured topic to occur in the paper title or abstract."""
+    searchable = f"{title or ''} {abstract or ''}"
+    return [
+        keyword.strip()
+        for keyword in keywords
+        if keyword.strip() and keyword_matches(searchable, keyword)
+    ]
 
 
 def truncate_text(text: str, max_length: int) -> str:
@@ -36,4 +90,3 @@ def generate_summary(paper: Dict) -> str:
         summary_lines.append(f"PDF: {paper['pdf_url']}")
     summary_lines.extend(["=" * 60, ""])
     return "\n".join(summary_lines)
-

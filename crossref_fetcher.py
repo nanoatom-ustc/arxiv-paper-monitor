@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 import requests
 
 from config import Config
-from paper_utils import generate_summary
+from paper_utils import find_matching_keywords, generate_summary, keyword_query_terms
 
 logger = logging.getLogger(__name__)
 
@@ -43,21 +43,32 @@ class CrossrefFetcher:
         papers_by_doi = {}
         rows = min(max(max_results, 20), 100)
         for keyword in self.keywords:
-            try:
-                for item in self._fetch_keyword(keyword, days_back, rows):
-                    paper = self._normalise_item(item, keyword)
-                    if paper and self._journal_allowed(paper["journal"]):
-                        existing = papers_by_doi.get(paper["doi"])
-                        if existing:
-                            existing["matched_keywords"] = sorted(
-                                set(existing["matched_keywords"] + paper["matched_keywords"])
-                            )
-                        else:
-                            papers_by_doi[paper["doi"]] = paper
-            except requests.RequestException as exc:
-                logger.warning("%s/Crossref 查询失败（关键词 %s）: %s", self.source_name, keyword, exc)
-            except (KeyError, TypeError, ValueError) as exc:
-                logger.warning("%s/Crossref 响应解析失败（关键词 %s）: %s", self.source_name, keyword, exc)
+            for query_term in keyword_query_terms(keyword):
+                try:
+                    for item in self._fetch_keyword(query_term, days_back, rows):
+                        paper = self._normalise_item(item)
+                        if paper and self._journal_allowed(paper["journal"]):
+                            existing = papers_by_doi.get(paper["doi"])
+                            if existing:
+                                existing["matched_keywords"] = sorted(
+                                    set(existing["matched_keywords"] + paper["matched_keywords"])
+                                )
+                            else:
+                                papers_by_doi[paper["doi"]] = paper
+                except requests.RequestException as exc:
+                    logger.warning(
+                        "%s/Crossref 查询失败（检索词 %s）: %s",
+                        self.source_name,
+                        query_term,
+                        exc,
+                    )
+                except (KeyError, TypeError, ValueError) as exc:
+                    logger.warning(
+                        "%s/Crossref 响应解析失败（检索词 %s）: %s",
+                        self.source_name,
+                        query_term,
+                        exc,
+                    )
 
         papers = sorted(papers_by_doi.values(), key=lambda paper: paper["published"], reverse=True)
         result = papers[:max_results]
@@ -89,7 +100,7 @@ class CrossrefFetcher:
         response.raise_for_status()
         return response.json()["message"]["items"]
 
-    def _normalise_item(self, item: dict, queried_keyword: str) -> Optional[Dict]:
+    def _normalise_item(self, item: dict) -> Optional[Dict]:
         doi = (item.get("DOI") or "").strip()
         title = " ".join(item.get("title") or []).strip()
         if not doi or not title:
@@ -97,14 +108,18 @@ class CrossrefFetcher:
 
         journal = " ".join(item.get("container-title") or []).strip()
         abstract = self._clean_abstract(item.get("abstract", ""))
+        matched = find_matching_keywords(title, abstract, self.keywords)
+        if not matched:
+            logger.info(
+                "跳过未在标题或摘要中严格命中主题的 %s 论文: %s",
+                self.source_name,
+                title[:60],
+            )
+            return None
+
         authors = [self._author_name(author) for author in item.get("author", [])]
         authors = [author for author in authors if author]
         article_url = item.get("URL") or f"https://doi.org/{doi}"
-
-        searchable = " ".join(
-            [title, abstract, journal, " ".join(authors), " ".join(item.get("subject") or [])]
-        ).lower()
-        matched = [kw.strip() for kw in self.keywords if kw.strip().lower() in searchable]
 
         return {
             "id": doi,
@@ -120,7 +135,7 @@ class CrossrefFetcher:
             "article_url": article_url,
             "source": self.source_name,
             "journal": journal or self.venue_fallback,
-            "matched_keywords": matched or [queried_keyword.strip()],
+            "matched_keywords": matched,
         }
 
     def _journal_allowed(self, journal: str) -> bool:
@@ -135,8 +150,6 @@ class CrossrefFetcher:
         normalised = re.sub(r"[^a-z0-9]", "", journal.lower())
         configured_normalised = re.sub(r"[^a-z0-9]", "", configured.lower())
         acronym = "".join(word[0] for word in re.findall(r"[a-z0-9]+", journal.lower()))
-        # Use exact normalised title matching so an allowlist entry such as
-        # "Nature" does not also admit every journal whose title starts with Nature.
         return configured_normalised == normalised or configured_normalised == acronym
 
     @staticmethod
@@ -177,6 +190,5 @@ class CrossrefFetcher:
     @staticmethod
     def _user_agent() -> str:
         if Config.CROSSREF_MAILTO:
-            return f"arxiv-paper-monitor/2.1 (mailto:{Config.CROSSREF_MAILTO})"
-        return "arxiv-paper-monitor/2.1"
-
+            return f"research-paper-digest/2.2 (mailto:{Config.CROSSREF_MAILTO})"
+        return "research-paper-digest/2.2"
