@@ -31,7 +31,7 @@ class Config:
 
     SEARCH_SOURCES = [
         source.lower()
-        for source in _csv_env("SEARCH_SOURCES", "arxiv,aps,nature,science")
+        for source in _csv_env("SEARCH_SOURCES", "arxiv,aps,nature,science,optica")
     ]
     SEARCH_CATEGORIES = _csv_env("SEARCH_CATEGORIES")
 
@@ -43,6 +43,7 @@ class Config:
         "npj Quantum Information,Nature Reviews Physics",
     )
     SCIENCE_JOURNALS = _csv_env("SCIENCE_JOURNALS", "Science,Science Advances")
+    OPTICA_JOURNALS = _csv_env("OPTICA_JOURNALS", "Optica,Optics Express")
 
     # PRB and PRD are excluded by default as requested. The variable remains
     # configurable so deployments can add other APS exclusions.
@@ -60,11 +61,10 @@ class Config:
         if not cls.EMAIL_SENDER or not cls.EMAIL_PASSWORD or not cls.RECIPIENT_EMAIL:
             raise ValueError("邮箱配置不完整，请检查 .env 文件或 GitHub Secrets")
 
-        supported_sources = {"arxiv", "aps", "nature", "science"}
+        supported_sources = {"arxiv", "aps", "nature", "science", "optica"}
         unknown_sources = set(cls.SEARCH_SOURCES) - supported_sources
         if unknown_sources:
             raise ValueError(f"不支持的数据源: {', '.join(sorted(unknown_sources))}")
         if not cls.SEARCH_SOURCES:
             raise ValueError("SEARCH_SOURCES 至少需要包含一个支持的数据源")
         return True
-

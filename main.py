@@ -9,6 +9,7 @@ from arxiv_fetcher import ArxivFetcher
 from config import Config
 from email_sender import EmailSender
 from nature_fetcher import NatureFetcher
+from optica_fetcher import OpticaFetcher
 from paper_utils import generate_summary
 from science_fetcher import ScienceFetcher
 
@@ -28,6 +29,7 @@ class PaperDailyDigest:
             "aps": APSFetcher,
             "nature": NatureFetcher,
             "science": ScienceFetcher,
+            "optica": OpticaFetcher,
         }
         self.fetchers = [factories[source]() for source in Config.SEARCH_SOURCES]
         self.email_sender = EmailSender()
@@ -101,4 +103,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
