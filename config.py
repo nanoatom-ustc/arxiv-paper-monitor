@@ -22,12 +22,10 @@ class Config:
     FETCH_DAYS = int(os.getenv("FETCH_DAYS", 1))
     MAX_RESULTS = int(os.getenv("MAX_RESULTS", 50))
 
-    SEARCH_KEYWORDS = _csv_env("SEARCH_KEYWORDS") or [
-        "Rydberg atom",
-        "magneto-optical trap",
-        "optical tweezers",
-        "nanophotonics",
-    ]
+    SEARCH_KEYWORDS = _csv_env(
+        "SEARCH_KEYWORDS",
+        "tweezer array,PIC,microring,nanofiber,surface force",
+    )
 
     SEARCH_SOURCES = [
         source.lower()
@@ -45,8 +43,6 @@ class Config:
     SCIENCE_JOURNALS = _csv_env("SCIENCE_JOURNALS", "Science,Science Advances")
     OPTICA_JOURNALS = _csv_env("OPTICA_JOURNALS", "Optica,Optics Express")
 
-    # PRB and PRD are excluded by default as requested. The variable remains
-    # configurable so deployments can add other APS exclusions.
     APS_EXCLUDE_JOURNALS = _csv_env(
         "APS_EXCLUDE_JOURNALS", "Physical Review B,Physical Review D,PRB,PRD"
     )

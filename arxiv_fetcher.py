@@ -5,7 +5,12 @@ from typing import Dict, List
 import arxiv
 
 from config import Config
-from paper_utils import generate_summary, truncate_text
+from paper_utils import (
+    find_matching_keywords,
+    generate_summary,
+    keyword_aliases,
+    truncate_text,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +25,10 @@ class ArxivFetcher:
     def fetch_recent_papers(self, days_back: int = 1, max_results: int = 50) -> List[Dict]:
         """Fetch recent arXiv papers matching the configured terms and categories."""
         try:
-            keyword_query = " OR ".join([f'all:"{kw.strip()}"' for kw in self.keywords])
+            query_terms = []
+            for keyword in self.keywords:
+                query_terms.extend(keyword_aliases(keyword))
+            keyword_query = " OR ".join([f'all:"{term}"' for term in query_terms])
             query = f"({keyword_query})"
 
             if Config.SEARCH_CATEGORIES:
@@ -43,8 +51,13 @@ class ArxivFetcher:
 
             papers = []
             for result in self.client.results(search):
-                search_text = f"{result.title} {result.summary}".lower()
-                matched_kws = [kw.strip() for kw in self.keywords if kw.strip().lower() in search_text]
+                matched_kws = find_matching_keywords(
+                    result.title, result.summary, self.keywords
+                )
+                if not matched_kws:
+                    logger.info("跳过未在标题或摘要中严格命中主题的 arXiv 论文: %s", result.title[:60])
+                    continue
+
                 paper = {
                     "id": result.get_short_id(),
                     "title": result.title,
@@ -59,7 +72,7 @@ class ArxivFetcher:
                     "source": self.source_name,
                     "journal": "",
                     "doi": result.doi or "",
-                    "matched_keywords": matched_kws or ["模糊匹配"],
+                    "matched_keywords": matched_kws,
                 }
                 papers.append(paper)
                 logger.info("找到 arXiv 论文: %s", paper["title"][:60])
@@ -77,4 +90,3 @@ class ArxivFetcher:
     def _truncate_text(self, text: str, max_length: int) -> str:
         """Backward-compatible text truncation API."""
         return truncate_text(text, max_length)
-
