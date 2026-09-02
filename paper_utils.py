@@ -3,7 +3,24 @@ from typing import Dict, Iterable, List
 
 
 _KEYWORD_ALIASES = {
-    "tweezer array": ("tweezer array", "tweezer arrays"),
+    "tweezer array": (
+        "tweezer array",
+        "tweezer arrays",
+        "optical tweezer array",
+        "optical tweezer arrays",
+        "atom tweezer array",
+        "atom tweezer arrays",
+        "atom array",
+        "atom arrays",
+        "atomic array",
+        "atomic arrays",
+        "neutral atom array",
+        "neutral atom arrays",
+        "array of tweezers",
+        "arrays of tweezers",
+        "array of optical tweezers",
+        "arrays of optical tweezers",
+    ),
     "pic": (
         "pic",
         "pics",
@@ -30,8 +47,16 @@ def keyword_aliases(keyword: str) -> List[str]:
 
 
 def keyword_query_terms(keyword: str) -> List[str]:
-    """Return a compact set of API query terms while keeping PIC discoverable."""
-    if _normalise_match_text(keyword) == "pic":
+    """Return a compact set of API query terms for semantic aliases."""
+    normalised = _normalise_match_text(keyword)
+    if normalised == "tweezer array":
+        return [
+            "tweezer array",
+            "atom array",
+            "neutral atom array",
+            "array of optical tweezers",
+        ]
+    if normalised == "pic":
         return ["PIC", "photonic integrated circuit", "integrated photonic circuit"]
     return [keyword.strip()]
 

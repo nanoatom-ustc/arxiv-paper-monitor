@@ -67,6 +67,30 @@ class KeywordMatchingTests(unittest.TestCase):
             with self.subTest(text=text, keyword=keyword):
                 self.assertTrue(keyword_matches(text, keyword))
 
+    def test_matches_tweezer_array_synonyms(self):
+        variants = [
+            "A programmable atom array for quantum simulation",
+            "Multiplexed photonic links for neutral-atom arrays",
+            "An atomic array coupled to a nanophotonic cavity",
+            "Coherent control of an array of optical tweezers",
+            "Reconfigurable arrays of tweezers",
+            "Scalable atom-tweezer arrays",
+        ]
+        for text in variants:
+            with self.subTest(text=text):
+                self.assertTrue(keyword_matches(text, "tweezer array"))
+
+    def test_tweezer_array_query_terms_include_broader_phrases(self):
+        self.assertEqual(
+            keyword_query_terms("tweezer array"),
+            [
+                "tweezer array",
+                "atom array",
+                "neutral atom array",
+                "array of optical tweezers",
+            ],
+        )
+
     def test_pic_requires_a_complete_term_or_expansion(self):
         self.assertFalse(keyword_matches("Topic modeling for optical data", "PIC"))
         self.assertEqual(
